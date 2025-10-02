@@ -61,7 +61,7 @@ def render_pie_chart(launch_site):
                      title='Launch Success Rate for Launch Site')
         return fig
     else:
-        dfFiltrado = spacex_df[spacex_df['Launch Site'] == 'CCAFS LC-40']['class'].value_counts().reset_index()
+        dfFiltrado = spacex_df[spacex_df['Launch Site'] == launch_site]['class'].value_counts().reset_index()
         fig = px.pie(dfFiltrado,
                      values='count',
                      names='class',
@@ -73,10 +73,12 @@ def render_pie_chart(launch_site):
               [Input(component_id='site-dropdown', component_property='value'),
                Input(component_id='payload-slider', component_property='value')])
 def calc_succes_rate_by_payload(site,payload):
+    min_rango, max_rango = payload
     if site == 'ALL':
-        dfFilter = spacex_df
+        dfFilter = spacex_df[(spacex_df['Payload Mass (kg)'] >= min_rango) & (spacex_df['Payload Mass (kg)'] <= max_rango)]
     else:
-        dfFilter = spacex_df[spacex_df['Launch Site'] == site]     
+        
+        dfFilter = spacex_df[(spacex_df['Launch Site'] == site) & (spacex_df['Payload Mass (kg)'] > min_rango) & (spacex_df['Payload Mass (kg)'] <= max_rango)]     
     fig = px.scatter(dfFilter,
                          x='Payload Mass (kg)',
                          y='class',
@@ -86,3 +88,6 @@ def calc_succes_rate_by_payload(site,payload):
 if __name__ == '__main__':
     app.run()
 
+### Comandos para correr el programa:
+# python3.8 -m  pip install pandas dash
+#
